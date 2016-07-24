@@ -12,7 +12,28 @@
 		91275A721D4450BF00A17B9E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 91275A701D4450BF00A17B9E /* Main.storyboard */; };
 		91275A741D4450BF00A17B9E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 91275A731D4450BF00A17B9E /* Assets.xcassets */; };
 		91275A771D4450BF00A17B9E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 91275A751D4450BF00A17B9E /* LaunchScreen.storyboard */; };
+		91275A7F1D4450FB00A17B9E /* Affdex.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 91275A7E1D4450FB00A17B9E /* Affdex.framework */; };
+		91275A801D4450FB00A17B9E /* Affdex.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 91275A7E1D4450FB00A17B9E /* Affdex.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		91275A831D44512700A17B9E /* SwiftViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91275A821D44512700A17B9E /* SwiftViewController.swift */; };
+		91275A851D44513700A17B9E /* AffdexSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91275A841D44513700A17B9E /* AffdexSwift.swift */; };
+		91275A891D44514F00A17B9E /* OpenCVWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 91275A881D44514F00A17B9E /* OpenCVWrapper.mm */; };
+		91275A8B1D4451A100A17B9E /* ImageAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91275A8A1D4451A100A17B9E /* ImageAssets.swift */; };
+		91275A8D1D4458D800A17B9E /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 91275A8C1D4458D700A17B9E /* opencv2.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		91275A811D4450FB00A17B9E /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				91275A801D4450FB00A17B9E /* Affdex.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		91275A691D4450BF00A17B9E /* EmojiFace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EmojiFace.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -22,6 +43,14 @@
 		91275A731D4450BF00A17B9E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		91275A761D4450BF00A17B9E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		91275A781D4450BF00A17B9E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		91275A7E1D4450FB00A17B9E /* Affdex.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Affdex.framework; sourceTree = "<group>"; };
+		91275A821D44512700A17B9E /* SwiftViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftViewController.swift; sourceTree = "<group>"; };
+		91275A841D44513700A17B9E /* AffdexSwift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AffdexSwift.swift; sourceTree = "<group>"; };
+		91275A861D44514F00A17B9E /* EmojiFace-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "EmojiFace-Bridging-Header.h"; sourceTree = "<group>"; };
+		91275A871D44514F00A17B9E /* OpenCVWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenCVWrapper.h; sourceTree = "<group>"; };
+		91275A881D44514F00A17B9E /* OpenCVWrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OpenCVWrapper.mm; sourceTree = "<group>"; };
+		91275A8A1D4451A100A17B9E /* ImageAssets.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageAssets.swift; sourceTree = "<group>"; };
+		91275A8C1D4458D700A17B9E /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -29,6 +58,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				91275A8D1D4458D800A17B9E /* opencv2.framework in Frameworks */,
+				91275A7F1D4450FB00A17B9E /* Affdex.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -38,6 +69,8 @@
 		91275A601D4450BF00A17B9E = {
 			isa = PBXGroup;
 			children = (
+				91275A8C1D4458D700A17B9E /* opencv2.framework */,
+				91275A7E1D4450FB00A17B9E /* Affdex.framework */,
 				91275A6B1D4450BF00A17B9E /* EmojiFace */,
 				91275A6A1D4450BF00A17B9E /* Products */,
 			);
@@ -56,10 +89,16 @@
 			children = (
 				91275A6C1D4450BF00A17B9E /* AppDelegate.swift */,
 				91275A6E1D4450BF00A17B9E /* ViewController.swift */,
-				91275A701D4450BF00A17B9E /* Main.storyboard */,
+				91275A821D44512700A17B9E /* SwiftViewController.swift */,
+				91275A841D44513700A17B9E /* AffdexSwift.swift */,
+				91275A8A1D4451A100A17B9E /* ImageAssets.swift */,
 				91275A731D4450BF00A17B9E /* Assets.xcassets */,
+				91275A701D4450BF00A17B9E /* Main.storyboard */,
 				91275A751D4450BF00A17B9E /* LaunchScreen.storyboard */,
 				91275A781D4450BF00A17B9E /* Info.plist */,
+				91275A871D44514F00A17B9E /* OpenCVWrapper.h */,
+				91275A881D44514F00A17B9E /* OpenCVWrapper.mm */,
+				91275A861D44514F00A17B9E /* EmojiFace-Bridging-Header.h */,
 			);
 			path = EmojiFace;
 			sourceTree = "<group>";
@@ -74,6 +113,7 @@
 				91275A651D4450BF00A17B9E /* Sources */,
 				91275A661D4450BF00A17B9E /* Frameworks */,
 				91275A671D4450BF00A17B9E /* Resources */,
+				91275A811D4450FB00A17B9E /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -136,8 +176,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				91275A831D44512700A17B9E /* SwiftViewController.swift in Sources */,
+				91275A891D44514F00A17B9E /* OpenCVWrapper.mm in Sources */,
+				91275A8B1D4451A100A17B9E /* ImageAssets.swift in Sources */,
 				91275A6F1D4450BF00A17B9E /* ViewController.swift in Sources */,
 				91275A6D1D4450BF00A17B9E /* AppDelegate.swift in Sources */,
+				91275A851D44513700A17B9E /* AffdexSwift.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -252,10 +296,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = EmojiFace/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = doug.EmojiFace;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "EmojiFace/EmojiFace-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
@@ -263,10 +314,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = EmojiFace/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = doug.EmojiFace;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "EmojiFace/EmojiFace-Bridging-Header.h";
 			};
 			name = Release;
 		};
