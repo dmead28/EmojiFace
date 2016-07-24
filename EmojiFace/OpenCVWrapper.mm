@@ -24,10 +24,14 @@
 
 + (UIImage *) warpSmiley:(UIImage *)originalImage fromPoints:(NSArray *)basePoints toPoints:(NSArray *)points usingSize:(CGSize)newSize {
     
-    // http://www.learnopencv.com/homography-examples-using-opencv-python-c/
+    // Some transform code taken from: http://www.learnopencv.com/homography-examples-using-opencv-python-c/
     
-    cv::Mat image =  [self cvMatFromUIImage: originalImage];
+    cv::Mat unsizedImage =  [self cvMatFromUIImage: originalImage];
+    cv::Mat image;
     cv::Mat newImage;
+    cv::Size cvSize = cv::Size(newSize.width, newSize.height);
+    
+    cv::resize(unsizedImage, image, cvSize);
     
     std::vector<cv::Point2f> srcPoints;
     std::vector<cv::Point2f> dstPoints;
@@ -48,8 +52,7 @@
     
     //# Warp source image to destination based on homography
     //newImage = cv2.warpPerspective(image, h, (image.shape[1],image.shape[0]))
-    cv::Size size = cv::Size(newSize.width, newSize.height);
-    warpPerspective(image, newImage, homography, size);
+    warpPerspective(image, newImage, homography, cvSize);
     
     UIImage * newImageOutput = [self UIImageFromCVMat: newImage];
     

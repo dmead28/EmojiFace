@@ -81,7 +81,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
         visualizePoints(points)
     }
     
-    func visualizePoints(points: [CGPoint] = [CGPoint]()) {
+    func visualizePoints(points: [CGPoint] = [CGPoint](), getAdjustedPoints shouldReturn: Bool = false) -> [CGPoint]? {
         
         // View must be square
         let side: CGFloat = 200.0
@@ -171,6 +171,12 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
             })
         }
         
+        // This is more for function syntactic sugar
+        if shouldReturn {
+            return newPoints
+        } else {
+            return nil
+        }
     }
     
     
@@ -319,8 +325,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
                 for keyPoint in keyPoints {
                     faceCGPointsRaw.append(facePointValues[keyPoint].CGPointValue())
                 }
-                let faceCGPoints = self!.normalizePoints(faceCGPointsRaw)
-                self!.visualizePoints(faceCGPoints)
+                let faceCGPoints = self!.visualizePoints(self!.normalizePoints(faceCGPointsRaw), getAdjustedPoints: true)!
  
                 var facePoints = [NSValue]()
                 for point in faceCGPoints {
