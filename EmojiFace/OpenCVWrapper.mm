@@ -37,9 +37,9 @@
     std::vector<cv::Point2f> dstPoints;
     
     dstPoints.push_back(cv::Point2f(0,0));
-    dstPoints.push_back(cv::Point2f(100 * 2,0));
-    dstPoints.push_back(cv::Point2f(0,100 * 2));
-    dstPoints.push_back(cv::Point2f(100 * 2,100 * 2));
+    dstPoints.push_back(cv::Point2f(150,0));
+    dstPoints.push_back(cv::Point2f(0,150));
+    dstPoints.push_back(cv::Point2f(150,150));
     
     
     //# Calculate Homography
@@ -48,7 +48,7 @@
     
     //# Warp source image to destination based on homography
     //newImage = cv2.warpPerspective(image, h, (image.shape[1],image.shape[0]))
-    cv::Size size = cv::Size(1, 2);
+    cv::Size size = image.size();
     warpPerspective(image, newImage, homography, size);
     
     UIImage * newImageOutput = [self UIImageFromCVMat: newImage];
@@ -56,6 +56,11 @@
     return newImageOutput;
 }
 
++ (UIImage *) testConvertBackAndForth:(UIImage *)image {
+    cv::Mat convertedImage = [self cvMatFromUIImage: image];
+    UIImage * originalImage = [self UIImageFromCVMat: convertedImage];
+    return originalImage;
+}
 
 // These functions taken from: http://docs.opencv.org/2.4/doc/tutorials/ios/image_manipulation/image_manipulation.html
 + (cv::Mat)cvMatFromUIImage:(UIImage *)image
@@ -75,7 +80,12 @@
                                                     kCGImageAlphaNoneSkipLast |
                                                     kCGBitmapByteOrderDefault); // Bitmap info flags
     
+    // Temp fix for issue with alpha background
+    CGContextSetRGBFillColor(contextRef, 1.0f, 1.0f, 1.0f, 1.0f);
+    CGContextFillRect(contextRef, CGRectMake(0, 0, cols, rows));
+    
     CGContextDrawImage(contextRef, CGRectMake(0, 0, cols, rows), image.CGImage);
+    
     CGContextRelease(contextRef);
     
     return cvMat;

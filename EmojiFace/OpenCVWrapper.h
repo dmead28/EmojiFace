@@ -14,4 +14,6 @@
 
 + (UIImage *) warpSmiley:(UIImage *)image;
 
++ (UIImage *) testConvertBackAndForth:(UIImage *)image;
+
 @end

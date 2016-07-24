@@ -27,12 +27,14 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
     // Used for experimenting with which point to use
     var variablePoint = 5
     
+    var transformImageBlock: (()->Void)?
+    
     
     // MARK: - ViewController
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        self.createDetector()
+        //self.createDetector()
     }
     
     override func viewDidLoad() {
@@ -45,15 +47,33 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
         self.view.addSubview(cameraView)
         self.view.addSubview(overlayView)
         
-        let recognizer = UITapGestureRecognizer(target: self, action: #selector(incrementVariablePoint))
-        self.view.addGestureRecognizer(recognizer)
+        // Experimenting with which points to use
+        //let recognizer = UITapGestureRecognizer(target: self, action: #selector(incrementVariablePoint))
+        //self.view.addGestureRecognizer(recognizer)
         
-        let _ = OpenCVWrapper.openCVVersionString()
+        // Experimenting with OpenCV / Objective-C++ / all other bug prone stuff...
+        // Messy but temp
+        print("Ready go!")
+        let testView = UIView(frame: self.view.frame)
+        self.view.addSubview(testView)
+        
+        let testImage = UIImage(asset: .PlainFace)!
+        let testImageView = UIImageView(image: testImage)
+        testView.addSubview(testImageView)
+        
+        let recognizer = UITapGestureRecognizer(target: self, action: #selector(transformImage))
+        self.view.addGestureRecognizer(recognizer)
+        self.transformImageBlock = {
+            testImageView.image = OpenCVWrapper.warpSmiley(testImage)
+            //testImageView.image = OpenCVWrapper.testConvertBackAndForth(testImage)
+        }
+        
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    // MARK: - Experimenting with OpenCV / Objective-C++ / all other bug prone stuff...
+    func transformImage() {
+        self.transformImageBlock?()
     }
     
     
