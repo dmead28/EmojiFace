@@ -81,7 +81,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
         visualizePoints(points)
     }
     
-    func visualizePoints(points: [CGPoint] = [CGPoint](), getAdjustedPoints shouldReturn: Bool = false) -> [CGPoint]? {
+    func visualizePoints(points: [CGPoint] = [CGPoint](), getAdjustedPoints shouldReturnNewPoints: Bool = false) -> [CGPoint] {
         
         // View must be square
         let side: CGFloat = 200.0
@@ -172,10 +172,10 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
         }
         
         // This is more for function syntactic sugar
-        if shouldReturn {
+        if shouldReturnNewPoints {
             return newPoints
         } else {
-            return nil
+            return points
         }
     }
     
@@ -314,18 +314,21 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
                 
                 UIGraphicsBeginImageContext(image.size)
                 
+                /*
                 let origin = facePointValues[5].CGPointValue()
                 let botRight = facePointValues[4].CGPointValue()
                 let bot = facePointValues[2].CGPointValue()
                 let rect = CGRect(x: origin.x, y: origin.y, width: botRight.x - origin.x, height: bot.y - origin.y)
-                //let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: image.size)
+                */
+                let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: image.size)
                 //self!.emojiImage.drawInRect(rect)
                 
                 var faceCGPointsRaw = [CGPoint]()
                 for keyPoint in keyPoints {
                     faceCGPointsRaw.append(facePointValues[keyPoint].CGPointValue())
                 }
-                let faceCGPoints = self!.visualizePoints(self!.normalizePoints(faceCGPointsRaw), getAdjustedPoints: true)!
+                //let faceCGPoints = self!.visualizePoints(self!.normalizePoints(faceCGPointsRaw), getAdjustedPoints: true)
+                let faceCGPoints = self!.visualizePoints(faceCGPointsRaw, getAdjustedPoints: false)
  
                 var facePoints = [NSValue]()
                 for point in faceCGPoints {
@@ -344,11 +347,19 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
                     NSValue(CGPoint: CGPoint(x: 0.0, y: 0.50694122) * side),
                     NSValue(CGPoint: CGPoint(x: 0.97676785, y: 0.48737508) * side)
                 ]
-                print(basePoints.count)
-                print(facePoints.count)
+                
+                print(basePoints)
+                print(facePoints)
                 
                 let newSmileyImage = OpenCVWrapper.warpSmiley(self!.emojiImage, fromPoints: basePoints, toPoints: facePoints, usingSize: rect.size)
                 newSmileyImage.drawInRect(rect)
+                
+                let ctx = UIGraphicsGetCurrentContext()
+                for point in faceCGPoints {
+                    let pointRect = CGRect(x: point.x, y: point.y, width: 5.0, height: 5.0)
+                    CGContextSetFillColorWithColor(ctx, UIColor.greenColor().CGColor)
+                    CGContextFillEllipseInRect(ctx, pointRect)
+                }
                 
                 let newImage = UIGraphicsGetImageFromCurrentImageContext()
                 self?.newImg = newImage
@@ -427,7 +438,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
         
         // create a new detector, set the processing frame rate in frames per second, and set the license string
         self.detector = AFDXDetector(delegate: self, usingCamera: AFDX_CAMERA_FRONT, maximumFaces: 1)
-        self.detector.maxProcessRate = 1
+        self.detector.maxProcessRate = 5
         self.detector.licenseString = AFFDEX_LICENSE
         
         // turn on all classifiers (emotions, expressions, and emojis)
