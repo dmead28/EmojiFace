@@ -80,12 +80,13 @@
                                                     8,                          // Bits per component
                                                     cvMat.step[0],              // Bytes per row
                                                     colorSpace,                 // Colorspace
-                                                    kCGImageAlphaNoneSkipLast |
+                                                    //kCGImageAlphaNoneSkipLast |
+                                                    kCGImageAlphaPremultipliedLast |
                                                     kCGBitmapByteOrderDefault); // Bitmap info flags
     
     // Temp fix for issue with alpha background
-    CGContextSetRGBFillColor(contextRef, 0.0f, 0.0f, 0.0f, 1.0f);
-    CGContextFillRect(contextRef, CGRectMake(0, 0, cols, rows));
+    //CGContextSetRGBFillColor(contextRef, 0.0f, 0.0f, 0.0f, 1.0f);
+    //CGContextFillRect(contextRef, CGRectMake(0, 0, cols, rows));
     
     CGContextDrawImage(contextRef, CGRectMake(0, 0, cols, rows), image.CGImage);
     
@@ -113,7 +114,8 @@
                                         8 * cvMat.elemSize(),                       //bits per pixel
                                         cvMat.step[0],                            //bytesPerRow
                                         colorSpace,                                 //colorspace
-                                        kCGImageAlphaNone|kCGBitmapByteOrderDefault,// bitmap info
+                                        //kCGImageAlphaNone|kCGBitmapByteOrderDefault,// bitmap info
+                                        kCGImageAlphaPremultipliedLast|kCGBitmapByteOrderDefault,// bitmap info
                                         provider,                                   //CGDataProviderRef
                                         NULL,                                       //decode
                                         false,                                      //should interpolate
