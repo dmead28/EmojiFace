@@ -84,7 +84,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
     
     func learningPoints(image: UIImage, facePointValues: [NSValue]) {
         
-        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), { [weak self] in
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0), { [weak self] in
             
             guard let _ = self else { return } // Shouldn't happen (only one controller)
             
@@ -145,7 +145,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
             
             guard let
                 face = valueObj as? AFDXFace,
-                emoji = DMEmoji(rawValue: Int(face.emojis.dominantEmoji.rawValue)),
+                emoji = EmojiSwift(rawValue: Int(face.emojis.dominantEmoji.rawValue)),
                 facePointValues = face.facePoints as? [NSValue]
             else {
                 print("ERROR in SwiftViewController.processedImageReady(): guard statement failed")
@@ -239,7 +239,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
 
 
 
-enum DMEmoji: Int {
+enum EmojiSwift: Int {
     case Relaxed = 9786
     case Smiley = 128515
     case Laughing = 128518
