@@ -12,7 +12,7 @@
 
 + (NSString *) openCVVersionString;
 
-+ (UIImage *) warpSmiley:(UIImage *)image;
++ (UIImage *) warpSmiley:(UIImage *)originalImage fromPoints:(NSArray *)basePoints toPoints:(NSArray *)points usingSize:(CGSize)newSize;
 
 + (UIImage *) testConvertBackAndForth:(UIImage *)image;
 

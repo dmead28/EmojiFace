@@ -29,12 +29,14 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
     
     var transformImageBlock: (()->Void)?
     
+    var vizView: UIView!
+    
     
     // MARK: - ViewController
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        //self.createDetector()
+        self.createDetector()
     }
     
     override func viewDidLoad() {
@@ -51,6 +53,133 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
         //let recognizer = UITapGestureRecognizer(target: self, action: #selector(incrementVariablePoint))
         //self.view.addGestureRecognizer(recognizer)
         
+        // Finding with un-warped points
+        let recognizer = UITapGestureRecognizer(target: self, action: #selector(setShouldPrint))
+        self.view.addGestureRecognizer(recognizer)
+        
+        //testOpenCVPP()
+        //testVisualizePoints()
+        
+    }
+    
+    
+    // MARK: - Experimenting with choice of base points
+    func testVisualizePoints() {
+        let side: CGFloat = 200.0
+        var points = [
+            CGPoint(x: 0.05713493, y: 0.0217283) * side,
+            CGPoint(x: 0.88429784, y: 0.0) * side,
+            CGPoint(x: 0.50275656, y: 1.0) * side,
+            CGPoint(x: 0.0, y: 0.50694122) * side,
+            CGPoint(x: 0.97676785, y: 0.48737508) * side
+        ]
+        //points[0].x += 50.0
+        points[1].x += 50.0
+        points[2].x += 50.0
+        //points[3].x += 50.0
+        points[4].x += 50.0
+        visualizePoints(points)
+    }
+    
+    func visualizePoints(points: [CGPoint] = [CGPoint]()) {
+        
+        // View must be square
+        let side: CGFloat = 200.0
+        
+        // Adjust normalized points
+        var newPoints = [CGPoint]()
+        for point in points {
+            newPoints.append(point * side) // overloaded * operator
+        }
+        
+        // BasePoints found using findAve.py
+        // TODO: Make points class rather than depending on array order
+        let basePoints = [
+            CGPoint(x: 0.05713493, y: 0.0217283) * side,
+            CGPoint(x: 0.88429784, y: 0.0) * side,
+            CGPoint(x: 0.50275656, y: 1.0) * side,
+            CGPoint(x: 0.0, y: 0.50694122) * side,
+            CGPoint(x: 0.97676785, y: 0.48737508) * side
+        ]
+        
+        if self.vizView == nil {
+            dispatch_async(dispatch_get_main_queue(), {
+                self.vizView = UIView(frame: CGRect(x: 50.0, y: 50.0, width: side + 100.0, height: side + 100.0))
+                self.vizView.backgroundColor = UIColor.whiteColor()
+                self.view.addSubview(self.vizView)
+            })
+        } else {
+            dispatch_async(dispatch_get_main_queue(), {
+                self.vizView.removeFromSuperview()
+                self.vizView = UIView(frame: CGRect(x: 50.0, y: 50.0, width: side + 100.0, height: side + 100.0))
+                self.vizView.backgroundColor = UIColor.whiteColor()
+                self.view.addSubview(self.vizView)
+            })
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), {
+            let smiley = UIImage(asset: .PlainFace)
+            self.vizView.layer.addSublayer(UIImageView(image: smiley).layer)
+        })
+        
+        var pointsValue = [NSValue]()
+        for point in newPoints {
+            pointsValue.append(NSValue(CGPoint: point)) // make sure to adjust to size (side ~= longEdge)
+        }
+        var basePointsValue = [NSValue]()
+        for point in basePoints {
+            basePointsValue.append(NSValue(CGPoint: point))
+        }
+        
+        // Warp image
+        /*
+        let newImage = OpenCVWrapper.warpSmiley(smiley, fromPoints: basePointsValue, toPoints: pointsValue, usingSize: self.view.frame.size)
+        let newImageView = UIImageView(image: newImage)
+        newImageView.frame.origin.x += 300.0
+        newImageView.frame.origin.y += 300.0
+        newImageView.backgroundColor = UIColor.clearColor()
+        self.view.addSubview(newImageView)
+        */
+        
+        // Boilerplate circle drawing code from: http://stackoverflow.com/questions/29616992/how-do-i-draw-a-circle-in-ios-swift
+        for point in basePoints {
+            // TODO: Overload * operator (CGPoint and CGFloat)
+            let circlePath = UIBezierPath(arcCenter: point, radius: 3.0, startAngle: 0, endAngle: CGFloat(M_PI * 2), clockwise: true)
+            let shapeLayer = CAShapeLayer()
+            shapeLayer.path = circlePath.CGPath
+            shapeLayer.fillColor = UIColor.blueColor().CGColor
+            shapeLayer.strokeColor = UIColor.redColor().CGColor
+            shapeLayer.lineWidth = 1.0
+            
+            dispatch_async(dispatch_get_main_queue(), {
+                self.vizView.layer.addSublayer(shapeLayer)
+            })
+        }
+        for point in newPoints {
+            // TODO: Overload * operator (CGPoint and CGFloat)
+            let circlePath = UIBezierPath(arcCenter: point, radius: 3.0, startAngle: 0, endAngle: CGFloat(M_PI * 2), clockwise: true)
+            let shapeLayer = CAShapeLayer()
+            shapeLayer.path = circlePath.CGPath
+            shapeLayer.fillColor = UIColor.greenColor().CGColor
+            shapeLayer.strokeColor = UIColor.blueColor().CGColor
+            shapeLayer.lineWidth = 1.0
+            
+            //print(point)
+            
+            dispatch_async(dispatch_get_main_queue(), {
+                self.vizView.layer.addSublayer(shapeLayer)
+            })
+        }
+        
+    }
+    
+    
+    // MARK: - Experimenting with OpenCV / Objective-C++ / all other bug prone stuff...
+    func transformImage() {
+        self.transformImageBlock?()
+    }
+    func testOpenCVPP() {
+        
         // Experimenting with OpenCV / Objective-C++ / all other bug prone stuff...
         // Messy but temp
         print("Ready go!")
@@ -64,16 +193,10 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
         let recognizer = UITapGestureRecognizer(target: self, action: #selector(transformImage))
         self.view.addGestureRecognizer(recognizer)
         self.transformImageBlock = {
-            testImageView.image = OpenCVWrapper.warpSmiley(testImage)
             //testImageView.image = OpenCVWrapper.testConvertBackAndForth(testImage)
+            //testImageView.image = OpenCVWrapper.warpSmiley(testImage) // needs new argument
         }
         
-    }
-    
-    
-    // MARK: - Experimenting with OpenCV / Objective-C++ / all other bug prone stuff...
-    func transformImage() {
-        self.transformImageBlock?()
     }
     
     
@@ -123,6 +246,11 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
         })
     }
     
+    func setShouldPrint() {
+        print("Blah")
+        self.shouldPrintPoints = true
+    }
+    
     
     // MARK: - Detector Delegate
     // From https://github.com/Affectiva/ios-sdk-samples
@@ -136,9 +264,9 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
     
     
     // MARK: - Convenience methods
-    // From https://github.com/Affectiva/ios-sdk-samples
     var newImg: UIImage?
     var isProcessing = false // TODO: move all properties to Properties section
+    var shouldPrintPoints = false
     func processedImageReady(detector: AFDXDetector, image: UIImage, faces: NSDictionary, atTime time: NSTimeInterval) {
         
         for valueObj in faces.allValues {
@@ -162,10 +290,21 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
                 
                 if self!.isProcessing {
                     // Skip it
-                    print("**** SKIPPED ****")
+                    print("**** SKIPPED FRAME ****")
                     return
                 }
                 self!.isProcessing = true
+                
+                let keyPoints: Set<Int> = [0, 2, 4, 5, 10]
+                if self!.shouldPrintPoints {
+                    print("****\nCGPoints for \(keyPoints): {")
+                    for point in keyPoints {
+                        print(facePointValues[point].CGPointValue())
+                    }
+                    print("}")
+                    print(" ")
+                    self!.shouldPrintPoints = false
+                }
                 
                 UIGraphicsBeginImageContext(image.size)
                 
@@ -173,7 +312,38 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
                 let botRight = facePointValues[4].CGPointValue()
                 let bot = facePointValues[2].CGPointValue()
                 let rect = CGRect(x: origin.x, y: origin.y, width: botRight.x - origin.x, height: bot.y - origin.y)
-                self!.emojiImage.drawInRect(rect)
+                //let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: image.size)
+                //self!.emojiImage.drawInRect(rect)
+                
+                var faceCGPointsRaw = [CGPoint]()
+                for keyPoint in keyPoints {
+                    faceCGPointsRaw.append(facePointValues[keyPoint].CGPointValue())
+                }
+                let faceCGPoints = self!.normalizePoints(faceCGPointsRaw)
+                self!.visualizePoints(faceCGPoints)
+ 
+                var facePoints = [NSValue]()
+                for point in faceCGPoints {
+                    facePoints.append(NSValue(CGPoint: point))
+                }
+                
+                // View must be square
+                let side: CGFloat = 200.0 // TODO: change this
+                
+                // Found using findAve.py
+                // TODO: Make points class rather than depending on array order
+                let basePoints = [
+                    NSValue(CGPoint: CGPoint(x: 0.05713493, y: 0.0217283) * side),
+                    NSValue(CGPoint: CGPoint(x: 0.88429784, y: 0.0) * side),
+                    NSValue(CGPoint: CGPoint(x: 0.50275656, y: 1.0) * side),
+                    NSValue(CGPoint: CGPoint(x: 0.0, y: 0.50694122) * side),
+                    NSValue(CGPoint: CGPoint(x: 0.97676785, y: 0.48737508) * side)
+                ]
+                print(basePoints.count)
+                print(facePoints.count)
+                
+                let newSmileyImage = OpenCVWrapper.warpSmiley(self!.emojiImage, fromPoints: basePoints, toPoints: facePoints, usingSize: rect.size)
+                newSmileyImage.drawInRect(rect)
                 
                 let newImage = UIGraphicsGetImageFromCurrentImageContext()
                 self?.newImg = newImage
@@ -184,6 +354,51 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
             })
         }
         
+    }
+    
+    func normalizePoints(points: [CGPoint]) -> [CGPoint] {
+        
+        print(points)
+        
+        // Find max, min -> longEdge
+        var maxPoint = points[0]
+        var minPoint = points[0]
+        
+        for point in points {
+            if point.x < minPoint.x {
+                minPoint.x = point.x
+            }
+            if point.y < minPoint.y {
+                minPoint.y = point.y
+            }
+            if point.x > maxPoint.x {
+                maxPoint.x = point.x
+            }
+            if point.y > maxPoint.y {
+                maxPoint.y = point.y
+            }
+        }
+        
+        print("min: \(minPoint) max: \(maxPoint)")
+        
+        let width = maxPoint.x - minPoint.x
+        let height = maxPoint.y - minPoint.y
+        print("width: \(width) height: \(height)")
+        
+        let longEdge = width > height ? width : height
+        
+        // Offset and divide
+        var outputPoints = points
+        for i in 0..<outputPoints.count {
+            outputPoints[i].x -= minPoint.x
+            outputPoints[i].y -= minPoint.y
+            outputPoints[i].x /= longEdge
+            outputPoints[i].y /= longEdge
+        }
+        
+        //print(outputPoints)
+        
+        return outputPoints
     }
     
     func unprocessedImageReady(detector: AFDXDetector, image: UIImage, atTime time: NSTimeInterval) {
@@ -207,7 +422,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
         
         // create a new detector, set the processing frame rate in frames per second, and set the license string
         self.detector = AFDXDetector(delegate: self, usingCamera: AFDX_CAMERA_FRONT, maximumFaces: 1)
-        self.detector.maxProcessRate = 5
+        self.detector.maxProcessRate = 1
         self.detector.licenseString = AFFDEX_LICENSE
         
         // turn on all classifiers (emotions, expressions, and emojis)
@@ -239,19 +454,4 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
 
 
 
-enum EmojiSwift: Int {
-    case Relaxed = 9786
-    case Smiley = 128515
-    case Laughing = 128518
-    case Kissing = 128535
-    case Disappointed = 128542
-    case Rage = 128545
-    case Smirk = 128527
-    case Wink = 128521
-    case TongueWink = 128540
-    case Tongue = 128539
-    case Flushed = 128563
-    case Scream = 128561
-    case None = 128528
-}
 

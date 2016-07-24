@@ -6,12 +6,14 @@
 //  Copyright © 2016 Doug. All rights reserved.
 //
 
+#import <UIKit/UIKit.h>
+#import <CoreGraphics/CoreGraphics.h>
+
 #import "OpenCVWrapper.h"
 #import <opencv2/opencv.hpp>
 #include "opencv2/calib3d/calib3d.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/core/core.hpp"
-
 
 
 @implementation OpenCVWrapper
@@ -20,7 +22,7 @@
     return [NSString stringWithFormat:@"OpenCV Version %s", CV_VERSION];
 }
 
-+ (UIImage *) warpSmiley:(UIImage *)originalImage {
++ (UIImage *) warpSmiley:(UIImage *)originalImage fromPoints:(NSArray *)basePoints toPoints:(NSArray *)points usingSize:(CGSize)newSize {
     
     // http://www.learnopencv.com/homography-examples-using-opencv-python-c/
     
@@ -28,19 +30,17 @@
     cv::Mat newImage;
     
     std::vector<cv::Point2f> srcPoints;
-    
-    srcPoints.push_back(cv::Point2f(0,0));
-    srcPoints.push_back(cv::Point2f(100,0));
-    srcPoints.push_back(cv::Point2f(0,100));
-    srcPoints.push_back(cv::Point2f(100,100));
-    
     std::vector<cv::Point2f> dstPoints;
     
-    dstPoints.push_back(cv::Point2f(0,0));
-    dstPoints.push_back(cv::Point2f(150,0));
-    dstPoints.push_back(cv::Point2f(0,150));
-    dstPoints.push_back(cv::Point2f(150,150));
-    
+    //NSLog(@"Count: %lu", (unsigned long)points.count);
+    for (int i = 0; i < basePoints.count; i++) {
+        CGPoint point = [[basePoints objectAtIndex: i] CGPointValue];
+        srcPoints.push_back(cv::Point2f(point.x,point.y));
+    }
+    for (int i = 0; i < points.count; i++) {
+        CGPoint point = [[points objectAtIndex: i] CGPointValue];
+        dstPoints.push_back(cv::Point2f(point.x,point.y));
+    }
     
     //# Calculate Homography
     //h, status = cv2.findHomography(originalPoints, newPoints)
@@ -48,7 +48,7 @@
     
     //# Warp source image to destination based on homography
     //newImage = cv2.warpPerspective(image, h, (image.shape[1],image.shape[0]))
-    cv::Size size = image.size();
+    cv::Size size = cv::Size(newSize.width, newSize.height);
     warpPerspective(image, newImage, homography, size);
     
     UIImage * newImageOutput = [self UIImageFromCVMat: newImage];
@@ -81,7 +81,7 @@
                                                     kCGBitmapByteOrderDefault); // Bitmap info flags
     
     // Temp fix for issue with alpha background
-    CGContextSetRGBFillColor(contextRef, 1.0f, 1.0f, 1.0f, 1.0f);
+    CGContextSetRGBFillColor(contextRef, 0.0f, 0.0f, 0.0f, 1.0f);
     CGContextFillRect(contextRef, CGRectMake(0, 0, cols, rows));
     
     CGContextDrawImage(contextRef, CGRectMake(0, 0, cols, rows), image.CGImage);
