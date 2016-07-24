@@ -336,7 +336,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
                 }
                 
                 // View must be square
-                let side: CGFloat = 200.0 // TODO: change this
+                let side: CGFloat = self!.emojiImage.size.height > self!.emojiImage.size.width ? self!.emojiImage.size.height : self!.emojiImage.size.width
                 
                 // Found using findAve.py
                 // TODO: Make points class rather than depending on array order
