@@ -31,7 +31,8 @@
     cv::Mat newImage;
     cv::Size cvSize = cv::Size(newSize.width, newSize.height);
     
-    cv::resize(unsizedImage, image, cvSize);
+    //cv::resize(unsizedImage, image, cvSize);
+    image = unsizedImage;
     
     std::vector<cv::Point2f> srcPoints;
     std::vector<cv::Point2f> dstPoints;

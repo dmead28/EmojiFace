@@ -93,11 +93,11 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
             // BasePoints found using findAve.py
             // TODO: Make points class rather than depending on array order
             basePoints = [
-                CGPoint(x: 0.05713493, y: 0.0217283) * side,
-                CGPoint(x: 0.88429784, y: 0.0) * side,
-                CGPoint(x: 0.50275656, y: 1.0) * side,
-                CGPoint(x: 0.0, y: 0.50694122) * side,
-                CGPoint(x: 0.97676785, y: 0.48737508) * side
+                CGPoint(x: 0.05713493, y: 0.0217283) * side + side/2.0,
+                CGPoint(x: 0.88429784, y: 0.0) * side + side/2.0,
+                CGPoint(x: 0.50275656, y: 1.0) * side + side/2.0,
+                CGPoint(x: 0.0, y: 0.50694122) * side + side/2.0,
+                CGPoint(x: 0.97676785, y: 0.48737508) * side + side/2.0
             ]
         }
         
@@ -109,14 +109,14 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
         
         if self.vizView == nil {
             dispatch_async(dispatch_get_main_queue(), {
-                self.vizView = UIView(frame: CGRect(x: 50.0, y: 50.0, width: side + 100.0, height: side + 100.0))
+                self.vizView = UIView(frame: CGRect(x: 50.0, y: 50.0, width: side, height: side))
                 self.vizView.backgroundColor = UIColor.whiteColor()
                 self.view.addSubview(self.vizView)
             })
         } else {
             dispatch_async(dispatch_get_main_queue(), {
                 self.vizView.removeFromSuperview()
-                self.vizView = UIView(frame: CGRect(x: 50.0, y: 50.0, width: side + 100.0, height: side + 100.0))
+                self.vizView = UIView(frame: CGRect(x: 50.0, y: 50.0, width: side, height: side))
                 self.vizView.backgroundColor = UIColor.whiteColor()
                 self.view.addSubview(self.vizView)
             })
@@ -295,6 +295,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
             
             // Leave this stuff to make writing the report easier
             //learningPoints(image, facePointValues: facePointValues)
+            
             dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), { [weak self] in
                 
                 guard let _ = self else { return } // Shouldn't happen (only one controller)
@@ -306,7 +307,8 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
                 }
                 self!.isProcessing = true
                 
-                let keyPoints: Set<Int> = [0, 2, 4, 5, 10]
+                //let keyPoints: Set<Int> = [1, 2, 3, 5, 10]
+                let keyPoints: Set<Int> = [1, 3, 5, 10]
                 if self!.shouldPrintPoints {
                     print("****\nCGPoints for \(keyPoints): {")
                     for point in keyPoints {
@@ -320,24 +322,22 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
                 UIGraphicsBeginImageContext(image.size)
                 
                 // View must be square
-                let side: CGFloat = self!.emojiImage.size.height > self!.emojiImage.size.width ? self!.emojiImage.size.height : self!.emojiImage.size.width
+                var side: CGFloat = self!.emojiImage.size.height > self!.emojiImage.size.width ? self!.emojiImage.size.height : self!.emojiImage.size.width
+                side /= 2.0
                 
                 // Found using findAve.py
                 // TODO: Make points class rather than depending on array order
-                let basePoints = [
-                    NSValue(CGPoint: CGPoint(x: 0.05713493, y: 0.0217283) * side),
-                    NSValue(CGPoint: CGPoint(x: 0.88429784, y: 0.0) * side),
-                    NSValue(CGPoint: CGPoint(x: 0.50275656, y: 1.0) * side),
-                    NSValue(CGPoint: CGPoint(x: 0.0, y: 0.50694122) * side),
-                    NSValue(CGPoint: CGPoint(x: 0.97676785, y: 0.48737508) * side)
-                ]
                 let baseCGPoints = [
-                    CGPoint(x: 0.05713493, y: 0.0217283) * side,
-                    CGPoint(x: 0.88429784, y: 0.0) * side,
-                    CGPoint(x: 0.50275656, y: 1.0) * side,
-                    CGPoint(x: 0.0, y: 0.50694122) * side,
-                    CGPoint(x: 0.97676785, y: 0.48737508) * side
+                    CGPoint(x: 0.0, y: 0.01475979) * side + side/2.0,
+                    CGPoint(x: 0.9185254, y: 0.0) * side + side/2.0,
+                    //CGPoint(x: 0.47270996, y: 1.0) * side + side/2.0,
+                    CGPoint(x: 0.81183313, y: 0.79335999) * side + side/2.0,
+                    CGPoint(x: 0.13385961, y: 0.80795644) * side + side/2.0
                 ]
+                var basePoints = [NSValue]()
+                for baseCGPoint in baseCGPoints {
+                    basePoints.append(NSValue(CGPoint: baseCGPoint))
+                }
                 
                 /*
                 let origin = facePointValues[5].CGPointValue()
@@ -345,7 +345,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
                 let bot = facePointValues[2].CGPointValue()
                 let rect = CGRect(x: origin.x, y: origin.y, width: botRight.x - origin.x, height: bot.y - origin.y)
                 */
-                let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: image.size)
+                let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: self!.view.frame.width, height: self!.view.frame.height))
                 //self!.emojiImage.drawInRect(rect)
                 
                 var faceCGPointsRaw = [CGPoint]()
@@ -359,10 +359,10 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
                 for point in faceCGPoints {
                     facePoints.append(NSValue(CGPoint: point))
                 }
-                
+                /*
                 print(basePoints)
                 print(facePoints)
-                
+                */
                 let newSmileyImage = OpenCVWrapper.warpSmiley(self!.emojiImage, fromPoints: basePoints, toPoints: facePoints, usingSize: rect.size)
                 newSmileyImage.drawInRect(rect)
                 
@@ -380,6 +380,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
                 
                 self!.isProcessing = false
             })
+            
         }
         
     }
@@ -473,8 +474,8 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
         
     }
     
+    // From https://github.com/Affectiva/ios-sdk-samples
     func destroyDetector() {
-        // From https://github.com/Affectiva/ios-sdk-samples
         self.detector?.stop()
     }
     
