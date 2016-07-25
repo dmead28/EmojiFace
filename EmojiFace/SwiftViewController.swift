@@ -81,26 +81,31 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
         visualizePoints(points)
     }
     
-    func visualizePoints(points: [CGPoint] = [CGPoint](), getAdjustedPoints shouldReturnNewPoints: Bool = false) -> [CGPoint] {
+    func visualizePoints(points: [CGPoint] = [CGPoint](), basePoints maybeBasePoints: [CGPoint]? = nil, side: CGFloat = 200.0, getAdjustedPoints shouldReturnNewPoints: Bool = false) -> [CGPoint] {
         
         // View must be square
-        let side: CGFloat = 200.0
+        //let side: CGFloat = 200.0
+        
+        var basePoints: [CGPoint]
+        if maybeBasePoints != nil {
+            basePoints = maybeBasePoints!
+        } else {
+            // BasePoints found using findAve.py
+            // TODO: Make points class rather than depending on array order
+            basePoints = [
+                CGPoint(x: 0.05713493, y: 0.0217283) * side,
+                CGPoint(x: 0.88429784, y: 0.0) * side,
+                CGPoint(x: 0.50275656, y: 1.0) * side,
+                CGPoint(x: 0.0, y: 0.50694122) * side,
+                CGPoint(x: 0.97676785, y: 0.48737508) * side
+            ]
+        }
         
         // Adjust normalized points
         var newPoints = [CGPoint]()
         for point in points {
             newPoints.append(point * side) // overloaded * operator
         }
-        
-        // BasePoints found using findAve.py
-        // TODO: Make points class rather than depending on array order
-        let basePoints = [
-            CGPoint(x: 0.05713493, y: 0.0217283) * side,
-            CGPoint(x: 0.88429784, y: 0.0) * side,
-            CGPoint(x: 0.50275656, y: 1.0) * side,
-            CGPoint(x: 0.0, y: 0.50694122) * side,
-            CGPoint(x: 0.97676785, y: 0.48737508) * side
-        ]
         
         if self.vizView == nil {
             dispatch_async(dispatch_get_main_queue(), {
@@ -314,6 +319,26 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
                 
                 UIGraphicsBeginImageContext(image.size)
                 
+                // View must be square
+                let side: CGFloat = self!.emojiImage.size.height > self!.emojiImage.size.width ? self!.emojiImage.size.height : self!.emojiImage.size.width
+                
+                // Found using findAve.py
+                // TODO: Make points class rather than depending on array order
+                let basePoints = [
+                    NSValue(CGPoint: CGPoint(x: 0.05713493, y: 0.0217283) * side),
+                    NSValue(CGPoint: CGPoint(x: 0.88429784, y: 0.0) * side),
+                    NSValue(CGPoint: CGPoint(x: 0.50275656, y: 1.0) * side),
+                    NSValue(CGPoint: CGPoint(x: 0.0, y: 0.50694122) * side),
+                    NSValue(CGPoint: CGPoint(x: 0.97676785, y: 0.48737508) * side)
+                ]
+                let baseCGPoints = [
+                    CGPoint(x: 0.05713493, y: 0.0217283) * side,
+                    CGPoint(x: 0.88429784, y: 0.0) * side,
+                    CGPoint(x: 0.50275656, y: 1.0) * side,
+                    CGPoint(x: 0.0, y: 0.50694122) * side,
+                    CGPoint(x: 0.97676785, y: 0.48737508) * side
+                ]
+                
                 /*
                 let origin = facePointValues[5].CGPointValue()
                 let botRight = facePointValues[4].CGPointValue()
@@ -328,25 +353,12 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
                     faceCGPointsRaw.append(facePointValues[keyPoint].CGPointValue())
                 }
                 //let faceCGPoints = self!.visualizePoints(self!.normalizePoints(faceCGPointsRaw), getAdjustedPoints: true)
-                let faceCGPoints = self!.visualizePoints(faceCGPointsRaw, getAdjustedPoints: false)
+                let faceCGPoints = self!.visualizePoints(faceCGPointsRaw, basePoints: baseCGPoints, side: side, getAdjustedPoints: false)
  
                 var facePoints = [NSValue]()
                 for point in faceCGPoints {
                     facePoints.append(NSValue(CGPoint: point))
                 }
-                
-                // View must be square
-                let side: CGFloat = self!.emojiImage.size.height > self!.emojiImage.size.width ? self!.emojiImage.size.height : self!.emojiImage.size.width
-                
-                // Found using findAve.py
-                // TODO: Make points class rather than depending on array order
-                let basePoints = [
-                    NSValue(CGPoint: CGPoint(x: 0.05713493, y: 0.0217283) * side),
-                    NSValue(CGPoint: CGPoint(x: 0.88429784, y: 0.0) * side),
-                    NSValue(CGPoint: CGPoint(x: 0.50275656, y: 1.0) * side),
-                    NSValue(CGPoint: CGPoint(x: 0.0, y: 0.50694122) * side),
-                    NSValue(CGPoint: CGPoint(x: 0.97676785, y: 0.48737508) * side)
-                ]
                 
                 print(basePoints)
                 print(facePoints)
