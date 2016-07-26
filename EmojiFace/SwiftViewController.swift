@@ -31,6 +31,10 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
     
     var vizView: UIView!
     
+    var side: CGFloat!
+    var baseCGPoints: [CGPoint]!
+    var basePoints: [NSValue]!
+    
     
     // MARK: - ViewController
     override func viewWillAppear(animated: Bool) {
@@ -60,6 +64,23 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
         //testOpenCVPP()
         //testVisualizePoints()
         
+        // View must be square
+        self.side = EmojiSwift.Smiley.image!.size.height > EmojiSwift.Smiley.image!.size.width ? EmojiSwift.Smiley.image!.size.height : EmojiSwift.Smiley.image!.size.width
+        side = side / 2.0
+        
+        // Found using findAve.py
+        // TODO: Make points class rather than depending on array order
+        self.baseCGPoints = [
+            CGPoint(x: 0.0, y: 0.01475979) * side + side/2.0,
+            CGPoint(x: 0.9185254, y: 0.0) * side + side/2.0,
+            //CGPoint(x: 0.47270996, y: 1.0) * side + side/2.0,
+            CGPoint(x: 0.81183313, y: 0.79335999) * side + side/2.0,
+            CGPoint(x: 0.13385961, y: 0.80795644) * side + side/2.0
+        ]
+        self.basePoints = [NSValue]()
+        for baseCGPoint in baseCGPoints {
+            basePoints.append(NSValue(CGPoint: baseCGPoint))
+        }
     }
     
     
@@ -283,26 +304,26 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
         
         for valueObj in faces.allValues {
             
-            guard let
-                face = valueObj as? AFDXFace,
-                emoji = EmojiSwift(rawValue: Int(face.emojis.dominantEmoji.rawValue)),
-                facePointValues = face.facePoints as? [NSValue]
-            else {
-                print("ERROR in SwiftViewController.processedImageReady(): guard statement failed")
-                return
-            }
-            
-            guard let emojiImage = emoji.image else {
-                    print("ERROR in SwiftViewController.processedImageReady(): emojiImage not found for \(emoji)")
-                    return
-            }
-            
-            print(emoji)
-            
             // Leave this stuff to make writing the report easier
             //learningPoints(image, facePointValues: facePointValues)
             
             dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), { [weak self] in
+                
+                guard let
+                    face = valueObj as? AFDXFace,
+                    emoji = EmojiSwift(rawValue: Int(face.emojis.dominantEmoji.rawValue)),
+                    facePointValues = face.facePoints as? [NSValue]
+                    else {
+                        print("ERROR in SwiftViewController.processedImageReady(): guard statement failed")
+                        return
+                }
+                
+                guard let emojiImage = emoji.image else {
+                    print("ERROR in SwiftViewController.processedImageReady(): emojiImage not found for \(emoji)")
+                    return
+                }
+                
+                //print(emoji)
                 
                 guard let _ = self else { return } // Shouldn't happen (only one controller)
                 
@@ -315,6 +336,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
                 
                 //let keyPoints: Set<Int> = [1, 2, 3, 5, 10]
                 let keyPoints: Set<Int> = [1, 3, 5, 10]
+                /*
                 if self!.shouldPrintPoints {
                     print("****\nCGPoints for \(keyPoints): {")
                     for point in keyPoints {
@@ -324,34 +346,15 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
                     print(" ")
                     self!.shouldPrintPoints = false
                 }
-                
+                */
                 UIGraphicsBeginImageContext(image.size)
-                
-                // View must be square
-                var side: CGFloat = EmojiSwift.Smiley.image!.size.height > EmojiSwift.Smiley.image!.size.width ? EmojiSwift.Smiley.image!.size.height : EmojiSwift.Smiley.image!.size.width
-                //  side /= 2.0
-                
-                // Found using findAve.py
-                // TODO: Make points class rather than depending on array order
-                let baseCGPoints = [
-                    CGPoint(x: 0.0, y: 0.01475979) * side + side/2.0,
-                    CGPoint(x: 0.9185254, y: 0.0) * side + side/2.0,
-                    //CGPoint(x: 0.47270996, y: 1.0) * side + side/2.0,
-                    CGPoint(x: 0.81183313, y: 0.79335999) * side + side/2.0,
-                    CGPoint(x: 0.13385961, y: 0.80795644) * side + side/2.0
-                ]
-                var basePoints = [NSValue]()
-                for baseCGPoint in baseCGPoints {
-                    basePoints.append(NSValue(CGPoint: baseCGPoint))
-                }
-                
                 /*
                 let origin = facePointValues[5].CGPointValue()
                 let botRight = facePointValues[4].CGPointValue()
                 let bot = facePointValues[2].CGPointValue()
                 let rect = CGRect(x: origin.x, y: origin.y, width: botRight.x - origin.x, height: bot.y - origin.y)
                 */
-                let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: self!.view.frame.width, height: self!.view.frame.height))
+                //let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: self!.view.frame.width, height: self!.view.frame.height))
                 //self!.emojiImage.drawInRect(rect)
                 
                 var faceCGPointsRaw = [CGPoint]()
@@ -359,32 +362,35 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
                     faceCGPointsRaw.append(facePointValues[keyPoint].CGPointValue())
                 }
                 //let faceCGPoints = self!.visualizePoints(self!.normalizePoints(faceCGPointsRaw), getAdjustedPoints: true)
-                let faceCGPoints = self!.visualizePoints(faceCGPointsRaw, basePoints: baseCGPoints, side: side, getAdjustedPoints: false)
+                //let faceCGPoints = self!.visualizePoints(faceCGPointsRaw, basePoints: baseCGPoints, side: side, getAdjustedPoints: false)
+                
+                // MARK: - Uncomment to visualize points in the top - left
+                //self!.visualizePoints(faceCGPointsRaw, basePoints: self!.baseCGPoints, side: self!.side, getAdjustedPoints: false)
  
                 var facePoints = [NSValue]()
-                for point in faceCGPoints {
+                for point in faceCGPointsRaw {
                     facePoints.append(NSValue(CGPoint: point))
                 }
                 /*
                 print(basePoints)
                 print(facePoints)
                 */
-                let newSmileyImage = OpenCVWrapper.warpSmiley(emojiImage, fromPoints: basePoints, toPoints: facePoints, usingSize: rect.size)
-                newSmileyImage.drawInRect(rect)
-                
+                let newSmileyImage = OpenCVWrapper.warpSmiley(emojiImage, fromPoints: self!.basePoints, toPoints: facePoints, usingSize: self!.view.frame.size)
+                newSmileyImage.drawInRect(self!.view.frame)
+                /* g
                 let ctx = UIGraphicsGetCurrentContext()
-                for point in faceCGPoints {
+                for point in faceCGPointsRaw {
                     let pointRect = CGRect(x: point.x, y: point.y, width: 5.0, height: 5.0)
                     CGContextSetFillColorWithColor(ctx, UIColor.greenColor().CGColor)
                     CGContextFillEllipseInRect(ctx, pointRect)
                 }
-                
+                */
                 let newImage = UIGraphicsGetImageFromCurrentImageContext()
                 self?.newImg = newImage
                 
                 UIGraphicsEndImageContext()
-                
                 self!.isProcessing = false
+                
             })
             
         }
@@ -457,7 +463,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
         
         // create a new detector, set the processing frame rate in frames per second, and set the license string
         self.detector = AFDXDetector(delegate: self, usingCamera: AFDX_CAMERA_FRONT, maximumFaces: 1)
-        self.detector.maxProcessRate = 5
+        self.detector.maxProcessRate = 15
         self.detector.licenseString = AFFDEX_LICENSE
         
         // turn on all classifiers (emotions, expressions, and emojis)
