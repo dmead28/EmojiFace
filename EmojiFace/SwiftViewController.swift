@@ -307,7 +307,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
             // Leave this stuff to make writing the report easier
             //learningPoints(image, facePointValues: facePointValues)
             
-            dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), { [weak self] in
+            dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), { [weak self] in
                 
                 guard let
                     face = valueObj as? AFDXFace,
@@ -377,7 +377,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
                 */
                 let newSmileyImage = OpenCVWrapper.warpSmiley(emojiImage, fromPoints: self!.basePoints, toPoints: facePoints, usingSize: self!.view.frame.size)
                 newSmileyImage.drawInRect(self!.view.frame)
-                /* g
+                /*
                 let ctx = UIGraphicsGetCurrentContext()
                 for point in faceCGPointsRaw {
                     let pointRect = CGRect(x: point.x, y: point.y, width: 5.0, height: 5.0)
@@ -445,7 +445,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
     func unprocessedImageReady(detector: AFDXDetector, image: UIImage, atTime time: NSTimeInterval) {
         dispatch_async(dispatch_get_main_queue()) { [weak self] in
             if self?.newImg != nil {
-                print("^^^^ Placed")
+                //print("^^^^ Placed")
                 self?.overlayView.image = self!.newImg!
                 self?.newImg = nil
             } else {
@@ -463,7 +463,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
         
         // create a new detector, set the processing frame rate in frames per second, and set the license string
         self.detector = AFDXDetector(delegate: self, usingCamera: AFDX_CAMERA_FRONT, maximumFaces: 1)
-        self.detector.maxProcessRate = 15
+        self.detector.maxProcessRate = 10
         self.detector.licenseString = AFFDEX_LICENSE
         
         // turn on all classifiers (emotions, expressions, and emojis)
