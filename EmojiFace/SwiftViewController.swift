@@ -286,11 +286,15 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
             guard let
                 face = valueObj as? AFDXFace,
                 emoji = EmojiSwift(rawValue: Int(face.emojis.dominantEmoji.rawValue)),
-                emojiImage = emoji.image,
                 facePointValues = face.facePoints as? [NSValue]
             else {
                 print("ERROR in SwiftViewController.processedImageReady(): guard statement failed")
                 return
+            }
+            
+            guard let emojiImage = emoji.image else {
+                    print("ERROR in SwiftViewController.processedImageReady(): emojiImage not found for \(emoji)")
+                    return
             }
             
             print(emoji)
@@ -325,7 +329,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
                 
                 // View must be square
                 var side: CGFloat = EmojiSwift.Smiley.image!.size.height > EmojiSwift.Smiley.image!.size.width ? EmojiSwift.Smiley.image!.size.height : EmojiSwift.Smiley.image!.size.width
-                side /= 2.0
+                //  side /= 2.0
                 
                 // Found using findAve.py
                 // TODO: Make points class rather than depending on array order
