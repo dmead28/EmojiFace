@@ -22,7 +22,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
     var cameraView: UIImageView!
     var overlayView: UIImageView!
     
-    let emojiImage = UIImage(asset: .PlainFace)! // for now !
+    //let emojiImage = UIImage(asset: .PlainFace)! // for now !
     
     // Used for experimenting with which point to use
     var variablePoint = 5
@@ -123,8 +123,9 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
         }
         
         dispatch_async(dispatch_get_main_queue(), {
-            let smiley = UIImage(asset: .PlainFace)
-            self.vizView.layer.addSublayer(UIImageView(image: smiley).layer)
+            if let smiley = EmojiSwift.None.image {
+                self.vizView.layer.addSublayer(UIImageView(image: smiley).layer)
+            }
         })
         
         var pointsValue = [NSValue]()
@@ -197,7 +198,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
         let testView = UIView(frame: self.view.frame)
         self.view.addSubview(testView)
         
-        let testImage = UIImage(asset: .PlainFace)!
+        let testImage = EmojiSwift.Smiley.image!
         let testImageView = UIImageView(image: testImage)
         testView.addSubview(testImageView)
         
@@ -285,6 +286,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
             guard let
                 face = valueObj as? AFDXFace,
                 emoji = EmojiSwift(rawValue: Int(face.emojis.dominantEmoji.rawValue)),
+                emojiImage = emoji.image,
                 facePointValues = face.facePoints as? [NSValue]
             else {
                 print("ERROR in SwiftViewController.processedImageReady(): guard statement failed")
@@ -322,7 +324,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
                 UIGraphicsBeginImageContext(image.size)
                 
                 // View must be square
-                var side: CGFloat = self!.emojiImage.size.height > self!.emojiImage.size.width ? self!.emojiImage.size.height : self!.emojiImage.size.width
+                var side: CGFloat = EmojiSwift.Smiley.image!.size.height > EmojiSwift.Smiley.image!.size.width ? EmojiSwift.Smiley.image!.size.height : EmojiSwift.Smiley.image!.size.width
                 side /= 2.0
                 
                 // Found using findAve.py
@@ -363,7 +365,7 @@ class SwiftViewController: UIViewController, AFDXDetectorDelegate {
                 print(basePoints)
                 print(facePoints)
                 */
-                let newSmileyImage = OpenCVWrapper.warpSmiley(self!.emojiImage, fromPoints: basePoints, toPoints: facePoints, usingSize: rect.size)
+                let newSmileyImage = OpenCVWrapper.warpSmiley(emojiImage, fromPoints: basePoints, toPoints: facePoints, usingSize: rect.size)
                 newSmileyImage.drawInRect(rect)
                 
                 let ctx = UIGraphicsGetCurrentContext()
