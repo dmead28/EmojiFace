@@ -1,4 +1,4 @@
 # EmojiFace
-Beginnings of my final project for Computational Photography. Still experimenting with a framework that will detect faces and emotions. Will use keypoints and emotion data to superimpose and transform the respective emoji to a person's face (possibly multiple faces) in real time. Continuation from EmojiFaceOLD (which was an Objective-C project)
+Emoji Face is an iOS app that uses the front facing camera to detect emotions, map that emotion to an emoji, then warp / transform the emoji image to the user’s face.. in real time.
 
-This is a Swift project with Objective-C++ code to interact with OpenCV. It also uses the Affdex framework for emotion detection.
+This project is still pretty messy due to tight time constraints.
